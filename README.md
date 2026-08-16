@@ -6,7 +6,7 @@ A complete end-to-end data warehousing and analytics solution built with Postgre
 
 ## Project Overview
 
-This project consolidates sales data from two source systems — a CRM and an ERP — into a unified data warehouse using a **medallion architecture** (Bronze → Silver → Gold). The result is a clean, analytics-ready star schema that supports business intelligence and reporting.
+This project consolidates sales data from two source systems — a CRM and an ERP — into a unified data warehouse using a **medallion architecture** (Bronze → Silver → Gold). The result is a clean, analytics-ready star schema that supports business intelligence and reporting, backed by 12 SQL-based analysis scripts covering everything from data exploration to customer/product performance reporting.
 
 ---
 
@@ -19,6 +19,7 @@ Source Systems          Bronze Layer         Silver Layer         Gold Layer
 CRM System    ───────►  bronze.crm_*  ────►  silver.crm_*  ────►  gold.dim_customers
 ERP System    ───────►  bronze.erp_*  ────►  silver.erp_*  ────►  gold.dim_products
                                                                    gold.fact_sales
+![Architecture diagram](docs/architecture-diagram.svg)
 ```
 
 ### Layer Descriptions
@@ -42,6 +43,8 @@ dim_products ────── fact_sales
   product_key │
               │
               └── order_date, sales_amount, quantity, price
+
+![Star schema diagram](docs/star-schema-diagram.svg)
 ```
 
 **Fact Table:** `gold.fact_sales` — transactional sales data
@@ -77,17 +80,39 @@ dim_products ────── fact_sales
 
 ---
 
+## Data Analysis Layer
+
+12 SQL scripts covering exploratory analysis through to full business reports, all querying the gold-layer star schema:
+
+| Script | What it answers |
+|--------|------------------|
+| `Date_Range_Exploration.sql` | What's the temporal span of the data? |
+| `Dimensions_Exploration.sql` | What distinct values exist across dimension tables (e.g. countries, categories)? |
+| `Measures_Exploration.sql` | What are the core aggregate metrics (total sales, orders, quantity)? |
+| `Magnitude_Analysis.sql` | How are totals distributed across categories (e.g. customers by country)? |
+| `Ranking_Analysis.sql` | Which products/customers rank highest or lowest by revenue? |
+| `Change_Over_Time_Analysis.sql` | How do key metrics trend month-over-month / year-over-year? |
+| `Cumulative_Analysis.sql` | What do running totals and moving averages look like over time? |
+| `Performance_Analysis.sql` | How does each product/region perform year-over-year against its own average? |
+| `Part_To_Whole_Analysis.sql` | Which categories contribute most to overall sales? |
+| `Data_Segmentation_Analysis.sql` | How do products/customers segment into meaningful groups (e.g. cost ranges)? |
+| `Customer_Report.sql` | Consolidated customer report — segments (VIP/Regular/New), total orders, sales, and quantity per customer |
+| `Product_Report.sql` | Consolidated product report — revenue segments (High/Mid/Low performers), orders, sales, and unique customers per product |
+
+---
+
 ## Project Structure
 
 ```
 sql-data-warehouse-project/
+├── datasets/
+│   ├── source_crm/           # Raw CRM CSVs (customer, product, sales)
+│   └── source_erp/           # Raw ERP CSVs (customer demographics, location, category)
 ├── scripts/
 │   ├── bronze_layer.sql      # Schema creation, table definitions, load procedure
 │   ├── silver_layer.sql      # Table definitions and ETL stored procedure
 │   └── gold_layer.sql        # Dimension and fact views (star schema)
-├── analysis/
-│   ├── eda.sql               # Exploratory data analysis queries
-│   └── business_insights.sql # Business KPI and reporting queries
+├── Data_Analysis/            # 12 SQL scripts — exploration through business reporting
 └── README.md
 ```
 
@@ -101,6 +126,7 @@ sql-data-warehouse-project/
 4. **Import CSV files** using pgAdmin Import/Export or the COPY command
 5. **Run silver_layer.sql** — creates silver tables and executes transformations
 6. **Run gold_layer.sql** — creates analytical views
+7. **Run any script in `Data_Analysis/`** against the gold layer to reproduce the reports
 
 ```sql
 -- Execute the load procedures
@@ -126,11 +152,18 @@ SELECT * FROM gold.dim_products LIMIT 10;
 ## Key SQL Concepts Demonstrated
 
 - Stored procedures with error handling
-- Window functions (ROW_NUMBER, LEAD)
-- Complex CASE statements for data standardization
+- Window functions (ROW_NUMBER, LEAD, LAG, RANK, DENSE_RANK, SUM/AVG OVER)
+- Complex CASE statements for data standardization and segmentation
 - Multi-table JOINs across source systems
 - Data type conversions and NULL handling
 - View creation for analytics layer
+- Consolidated reporting views (customer and product 360° reports)
+
+---
+
+## Credits
+
+The medallion architecture (Bronze/Silver/Gold) and overall project structure follow a well-known SQL data warehousing tutorial pattern. The implementation — schema design, transformation logic, stored procedures, and all 12 analysis scripts — was built independently in PostgreSQL using pgAdmin, as a hands-on way to learn the pattern rather than a direct copy.
 
 ---
 
