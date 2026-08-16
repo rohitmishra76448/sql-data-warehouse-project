@@ -19,8 +19,8 @@ Source Systems          Bronze Layer         Silver Layer         Gold Layer
 CRM System    ───────►  bronze.crm_*  ────►  silver.crm_*  ────►  gold.dim_customers
 ERP System    ───────►  bronze.erp_*  ────►  silver.erp_*  ────►  gold.dim_products
                                                                    gold.fact_sales
-![Architecture diagram](docs/architecture-diagram.svg)
 ```
+![Architecture diagram](docs/architecture-diagram.svg)
 
 ### Layer Descriptions
 
@@ -44,8 +44,8 @@ dim_products ────── fact_sales
               │
               └── order_date, sales_amount, quantity, price
 
-![Star schema diagram](docs/star-schema-diagram.svg)
 ```
+![Star schema diagram](docs/star-schema-diagram.svg)
 
 **Fact Table:** `gold.fact_sales` — transactional sales data
 
